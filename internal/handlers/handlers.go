@@ -41,7 +41,7 @@ func Login(auth *auth.Authenticator, store *session.Store) fiber.Handler {
 	}
 }
 
-func CallbackHandler(auth *auth.Authenticator, store *session.Store) fiber.Handler {
+func Callback(auth *auth.Authenticator, store *session.Store) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		session, err := store.Get(c)
@@ -87,7 +87,7 @@ func CallbackHandler(auth *auth.Authenticator, store *session.Store) fiber.Handl
 	}
 }
 
-func LogoutHandler(c *fiber.Ctx) error {
+func Logout(c *fiber.Ctx) error {
 	logoutUrl, err := url.Parse("https://" + os.Getenv("AUTH0_DOMAIN") + "/v2/logout")
 	if err != nil {
 		fmt.Println("error in LogoutHandler failed to parse url")
@@ -110,4 +110,61 @@ func LogoutHandler(c *fiber.Ctx) error {
 	logoutUrl.RawQuery = parameters.Encode()
 
 	return c.Redirect(logoutUrl.String(), http.StatusTemporaryRedirect)
+}
+
+func IsAuthenticated(store *session.Store) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// get "profile" from session
+		// Get session from storage
+		sess, err := store.Get(c)
+		if err != nil {
+			fmt.Println("error in IsAuthenticated while getting session")
+			c.Status(http.StatusInternalServerError)
+			return c.SendString("error")
+		}
+
+		// Get value
+		profile := sess.Get("profile")
+		if profile == nil {
+			return c.Redirect("/", http.StatusSeeOther)
+		}
+
+		c.Locals("profile", profile)
+
+		return c.Next()
+	}
+}
+
+func User(c *fiber.Ctx) error {
+
+	// var profile map[string]interface{}
+	// gottenProfile := c.Locals("profile")
+	// profile, ok := gottenProfile.(map[string]interface{})
+	// if !ok {
+	// 	fmt.Println("error in UserHandler while casting locals profile")
+	// 	c.Status(http.StatusInternalServerError)
+	// 	return c.SendString("error")
+	// }
+
+	return c.Render("user", fiber.Map{})
+}
+
+func Test(c *fiber.Ctx) error {
+
+	gottenProfile := c.Locals("profile")
+	profile, ok := gottenProfile.(map[string]interface{})
+	if !ok {
+		fmt.Println("error in UserHandler while casting locals profile")
+		c.Status(http.StatusInternalServerError)
+		return c.SendString("error")
+	}
+
+	fmt.Println("got this profile: ")
+	fmt.Println(profile)
+
+	return c.JSON(profile)
+}
+
+func Home(c *fiber.Ctx) error {
+	return c.Render("index", fiber.Map{})
 }

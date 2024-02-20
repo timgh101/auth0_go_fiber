@@ -30,9 +30,15 @@ func main() {
 
 	store := session.New()
 
+	// middleware
+	app.Use(handlers.IsAuthenticated(store))
+
+	// routes
+	app.Get("/", handlers.Home)
 	app.Get("/login", handlers.Login(auth, store))
-	app.Get("/callback", handlers.CallbackHandler(auth, store))
-	app.Get("/logout", handlers.LogoutHandler)
+	app.Get("/callback", handlers.Callback(auth, store))
+	app.Get("/logout", handlers.Logout)
+	app.Get("/user", handlers.User)
 
 	log.Fatal(app.Listen(os.Getenv("APP_URL")))
 }
