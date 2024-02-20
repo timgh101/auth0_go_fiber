@@ -3,6 +3,8 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"net/url"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
@@ -83,4 +85,29 @@ func CallbackHandler(auth *auth.Authenticator, store *session.Store) fiber.Handl
 		// Redirect to logged in page.
 		return c.Redirect("/user", http.StatusTemporaryRedirect)
 	}
+}
+
+func LogoutHandler(c *fiber.Ctx) error {
+	logoutUrl, err := url.Parse("https://" + os.Getenv("AUTH0_DOMAIN") + "/v2/logout")
+	if err != nil {
+		fmt.Println("error in LogoutHandler failed to parse url")
+		c.Status(http.StatusInternalServerError)
+		return c.SendString("error")
+	}
+
+	scheme := c.Protocol()
+
+	returnTo, err := url.Parse(scheme + "://" + string(c.Request().Host()))
+	if err != nil {
+		fmt.Println("error in LogoutHandler failed to parse url 222")
+		c.Status(http.StatusInternalServerError)
+		return c.SendString("error")
+	}
+
+	parameters := url.Values{}
+	parameters.Add("returnTo", returnTo.String())
+	parameters.Add("client_id", os.Getenv("AUTH0_CLIENT_ID"))
+	logoutUrl.RawQuery = parameters.Encode()
+
+	return c.Redirect(logoutUrl.String(), http.StatusTemporaryRedirect)
 }

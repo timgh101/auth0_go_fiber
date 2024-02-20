@@ -2,9 +2,11 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
 	"github.com/timgh101/auth0_go_fiber/internal/auth"
 	"github.com/timgh101/auth0_go_fiber/internal/handlers"
@@ -15,7 +17,11 @@ func main() {
 		log.Fatalf("Failed to load the env vars: %v", err)
 	}
 
-	app := fiber.New()
+	engine := html.New("./web/views", ".html")
+	app := fiber.New(fiber.Config{
+		Views:             engine,
+		PassLocalsToViews: true,
+	})
 
 	auth, err := auth.New()
 	if err != nil {
@@ -25,6 +31,7 @@ func main() {
 	store := session.New()
 
 	app.Get("/login", handlers.Login(auth, store))
+	app.Get("/callback", handlers.CallbackHandler(auth, store))
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(os.Getenv("APP_URL")))
 }

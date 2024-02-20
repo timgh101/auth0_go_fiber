@@ -7,6 +7,9 @@ require (
 	github.com/coreos/go-oidc/v3 v3.9.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.1 // indirect
 	github.com/gofiber/fiber/v2 v2.52.0 // indirect
+	github.com/gofiber/template v1.8.3 // indirect
+	github.com/gofiber/template/html/v2 v2.1.1 // indirect
+	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
