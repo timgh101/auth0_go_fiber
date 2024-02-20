@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"log"
 	"os"
 
@@ -16,6 +17,8 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Failed to load the env vars: %v", err)
 	}
+
+	gob.Register(map[string]interface{}{})
 
 	engine := html.New("./web/views", ".html")
 	app := fiber.New(fiber.Config{
@@ -39,6 +42,7 @@ func main() {
 	app.Get("/callback", handlers.Callback(auth, store))
 	app.Get("/logout", handlers.Logout)
 	app.Get("/user", handlers.User)
+	app.Get("/test", handlers.Test)
 
 	log.Fatal(app.Listen(os.Getenv("APP_URL")))
 }

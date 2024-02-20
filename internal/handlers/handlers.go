@@ -77,7 +77,8 @@ func Callback(auth *auth.Authenticator, store *session.Store) fiber.Handler {
 		session.Set("profile", profile)
 		err = session.Save()
 		if err != nil {
-			fmt.Println("error in Login CallbackHandler while saving session")
+			fmt.Println("error in Login CallbackHandler while saving session: ")
+			fmt.Println(err)
 			c.Status(http.StatusInternalServerError)
 			return c.SendString("error")
 		}
