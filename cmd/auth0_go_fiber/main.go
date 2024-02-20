@@ -32,6 +32,7 @@ func main() {
 
 	app.Get("/login", handlers.Login(auth, store))
 	app.Get("/callback", handlers.CallbackHandler(auth, store))
+	app.Get("/logout", handlers.LogoutHandler)
 
 	log.Fatal(app.Listen(os.Getenv("APP_URL")))
 }
