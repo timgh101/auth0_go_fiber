@@ -82,6 +82,5 @@ func CallbackHandler(auth *auth.Authenticator, store *session.Store) fiber.Handl
 
 		// Redirect to logged in page.
 		return c.Redirect("/user", http.StatusTemporaryRedirect)
-		// ctx.Redirect(http.StatusTemporaryRedirect, "/user")
 	}
 }
