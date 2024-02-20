@@ -52,7 +52,7 @@ func Callback(auth *auth.Authenticator, store *session.Store) fiber.Handler {
 		}
 
 		// Exchange an authorization code for a token.
-		token, err := auth.Exchange(c.Context(), c.Params("code"))
+		token, err := auth.Exchange(c.Context(), c.Query("code"))
 		if err != nil {
 			fmt.Println("error in CallbackHandler while getting token")
 			c.Status(http.StatusInternalServerError)
@@ -126,7 +126,7 @@ func IsAuthenticated(store *session.Store) fiber.Handler {
 		// Get value
 		profile := sess.Get("profile")
 		if profile == nil {
-			return c.Redirect("/", http.StatusSeeOther)
+			return c.Next()
 		}
 
 		c.Locals("profile", profile)
